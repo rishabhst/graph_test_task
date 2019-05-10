@@ -320,33 +320,68 @@ Then Response:
             "v4"
         ]
     ],
-    "bounding_rectangle_coordinates": {
-        "point1": {
-            "top": 9,
-            "left": 14,
-            "bottom": 31,
-            "right": 151
+    "bounding_rectangle_coordinates": [
+        {
+            "island": "v1,v2,v3",
+            "bounding_rectangle_points": {
+                "point1": {
+                    "top": 9,
+                    "left": 14,
+                    "bottom": 31,
+                    "right": 126
+                },
+                "point2": {
+                    "top": 9,
+                    "left": 101,
+                    "bottom": 31,
+                    "right": 49
+                },
+                "point3": {
+                    "top": 11,
+                    "left": 14,
+                    "bottom": 29,
+                    "right": 126
+                },
+                "point4": {
+                    "top": 11,
+                    "left": 101,
+                    "bottom": 29,
+                    "right": 49
+                }
+            }
         },
-        "point2": {
-            "top": 9,
-            "left": 101,
-            "bottom": 31,
-            "right": 49
-        },
-        "point3": {
-            "top": 11,
-            "left": 14,
-            "bottom": 29,
-            "right": 151
-        },
-        "point4": {
-            "top": 11,
-            "left": 101,
-            "bottom": 29,
-            "right": 49
+        {
+            "island": "v4",
+            "bounding_rectangle_points": {
+                "point1": {
+                    "top": 9,
+                    "left": 99,
+                    "bottom": 31,
+                    "right": 151
+                },
+                "point2": {
+                    "top": 9,
+                    "left": 101,
+                    "bottom": 31,
+                    "right": 149
+                },
+                "point3": {
+                    "top": 11,
+                    "left": 99,
+                    "bottom": 29,
+                    "right": 151
+                },
+                "point4": {
+                    "top": 11,
+                    "left": 101,
+                    "bottom": 29,
+                    "right": 149
+                }
+            }
         }
-    }
+    ]
 }
+```
 
 9. Api to get overlap node:
 ```sh

@@ -195,26 +195,57 @@ class GraphListIslandsAPIView(APIView):
         islands = list(nx.connected_component_subgraphs(graph_obj, copy=True))
         island_list = [list(island.nodes) for island in islands]
 
-        min_top = Node.objects.filter(graph=graph).annotate(top=Cast(KeyTextTransform('top', 'position'), IntegerField())).aggregate(Min('top')).get('top__min')
-        max_top = Node.objects.filter(graph=graph).annotate(top=Cast(KeyTextTransform('top', 'position'), IntegerField())).aggregate(Max('top')).get('top__max')
+        bounding_rectangle_coordinates = []
+        for island in island_list:
+            if len(island) == 1:
+                node = Node.objects.get(graph=graph, nod_id__in=island)
+                min_top = max_top = int(node.position['top'])
+                min_left = max_left = int(node.position['left'])
+                min_bottom = max_bottom = int(node.position['bottom'])
+                min_right = max_right = int(node.position['right'])
+            else:
+                min_top = Node.objects.filter(graph=graph, nod_id__in=island).annotate(top=Cast(KeyTextTransform('top', 'position'), IntegerField())).aggregate(Min('top')).get('top__min')
+                max_top = Node.objects.filter(graph=graph, nod_id__in=island).annotate(top=Cast(KeyTextTransform('top', 'position'), IntegerField())).aggregate(Max('top')).get('top__max')
 
-        min_left = Node.objects.filter(graph=graph).annotate(left=Cast(KeyTextTransform('left', 'position'), IntegerField())).aggregate(Min('left')).get('left__min')
-        max_left = Node.objects.filter(graph=graph).annotate(left=Cast(KeyTextTransform('left', 'position'), IntegerField())).aggregate(Max('left')).get('left__max')
+                min_left = Node.objects.filter(graph=graph, nod_id__in=island).annotate(left=Cast(KeyTextTransform('left', 'position'), IntegerField())).aggregate(Min('left')).get('left__min')
+                max_left = Node.objects.filter(graph=graph, nod_id__in=island).annotate(left=Cast(KeyTextTransform('left', 'position'), IntegerField())).aggregate(Max('left')).get('left__max')
 
-        min_bottom = Node.objects.filter(graph=graph).annotate(bottom = Cast(KeyTextTransform('bottom', 'position'), IntegerField())).aggregate(Min('bottom')).get('bottom__min')
-        max_bottom = Node.objects.filter(graph=graph).annotate(bottom=Cast(KeyTextTransform('bottom', 'position'), IntegerField())).aggregate(Max('bottom')).get('bottom__max')
+                min_bottom = Node.objects.filter(graph=graph, nod_id__in=island).annotate(bottom = Cast(KeyTextTransform('bottom', 'position'), IntegerField())).aggregate(Min('bottom')).get('bottom__min')
+                max_bottom = Node.objects.filter(graph=graph, nod_id__in=island).annotate(bottom=Cast(KeyTextTransform('bottom', 'position'), IntegerField())).aggregate(Max('bottom')).get('bottom__max')
 
-        min_right = Node.objects.filter(graph=graph).annotate(right=Cast(KeyTextTransform('right', 'position'), IntegerField())).aggregate(Min('right')).get('right__min')
-        max_right = Node.objects.filter(graph=graph).annotate(right=Cast(KeyTextTransform('right', 'position'), IntegerField())).aggregate(Max('right')).get('right__max')
+                min_right = Node.objects.filter(graph=graph, nod_id__in=island).annotate(right=Cast(KeyTextTransform('right', 'position'), IntegerField())).aggregate(Min('right')).get('right__min')
+                max_right = Node.objects.filter(graph=graph, nod_id__in=island).annotate(right=Cast(KeyTextTransform('right', 'position'), IntegerField())).aggregate(Max('right')).get('right__max')
 
-        bounding_rectangle_coordinates = {
-            'point1': {"top": min_top - 1, "left": min_left - 1, "bottom": max_bottom + 1, "right": max_right + 1},
-            'point2': {"top": min_top - 1, "left": max_left + 1, "bottom": max_bottom + 1, "right": min_right -1},
-            'point3': {"top": max_top + 1, "left": min_left - 1, "bottom": min_bottom-1, "right": max_right+1},
-            'point4': {"top": max_top + 1, "left": max_left + 1, "bottom": min_bottom - 1, "right": min_right - 1}
+            bounding_rectangle_coordinates.append(
+                {
+                    'island': ",".join(island),
+                    'bounding_rectangle_points': {
+                        'point1': {"top": min_top - 1, "left": min_left - 1, "bottom": max_bottom + 1, "right": max_right + 1},
+                        'point2': {"top": min_top - 1, "left": max_left + 1, "bottom": max_bottom + 1, "right": min_right -1},
+                        'point3': {"top": max_top + 1, "left": min_left - 1, "bottom": min_bottom-1, "right": max_right+1},
+                        'point4': {"top": max_top + 1, "left": max_left + 1, "bottom": min_bottom - 1, "right": min_right - 1}
+                    }
             }
 
-        
+        )
+        # min_top = Node.objects.filter(graph=graph).annotate(top=Cast(KeyTextTransform('top', 'position'), IntegerField())).aggregate(Min('top')).get('top__min')
+        # max_top = Node.objects.filter(graph=graph).annotate(top=Cast(KeyTextTransform('top', 'position'), IntegerField())).aggregate(Max('top')).get('top__max')
+
+        # min_left = Node.objects.filter(graph=graph).annotate(left=Cast(KeyTextTransform('left', 'position'), IntegerField())).aggregate(Min('left')).get('left__min')
+        # max_left = Node.objects.filter(graph=graph).annotate(left=Cast(KeyTextTransform('left', 'position'), IntegerField())).aggregate(Max('left')).get('left__max')
+
+        # min_bottom = Node.objects.filter(graph=graph).annotate(bottom = Cast(KeyTextTransform('bottom', 'position'), IntegerField())).aggregate(Min('bottom')).get('bottom__min')
+        # max_bottom = Node.objects.filter(graph=graph).annotate(bottom=Cast(KeyTextTransform('bottom', 'position'), IntegerField())).aggregate(Max('bottom')).get('bottom__max')
+
+        # min_right = Node.objects.filter(graph=graph).annotate(right=Cast(KeyTextTransform('right', 'position'), IntegerField())).aggregate(Min('right')).get('right__min')
+        # max_right = Node.objects.filter(graph=graph).annotate(right=Cast(KeyTextTransform('right', 'position'), IntegerField())).aggregate(Max('right')).get('right__max')
+
+        # bounding_rectangle_coordinates = {
+        #     'point1': {"top": min_top - 1, "left": min_left - 1, "bottom": max_bottom + 1, "right": max_right + 1},
+        #     'point2': {"top": min_top - 1, "left": max_left + 1, "bottom": max_bottom + 1, "right": min_right -1},
+        #     'point3': {"top": max_top + 1, "left": min_left - 1, "bottom": min_bottom-1, "right": max_right+1},
+        #     'point4': {"top": max_top + 1, "left": max_left + 1, "bottom": min_bottom - 1, "right": min_right - 1}
+        #     }        
         return Response({ 'Disjoint islands': island_list, 'bounding_rectangle_coordinates': bounding_rectangle_coordinates },
                         status=status.HTTP_200_OK)         
 
